@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GELEYA.AI | Autonomous Data Analysis & RAG Agent</title>
+    <meta name="description" content="Autonomous AI Agent for end-to-end data analysis, cleaning, and RAG-based document Q&A.">
+    <meta name="keywords" content="AI, Data Analysis, RAG, Vector DB, Dashboard, React, Agent">
+    
+    <!-- React & ReactDOM -->
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <link href="https://resource.trickle.so/vendor_lib/unpkg/lucide-static@0.516.0/font/lucide.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+    <script>
+        // Store ChartJS globally to avoid conflicts
+        window.ChartJS = window.Chart;
+        // Global default font
+        window.Chart.defaults.font.family = "'Inter', sans-serif";
+        window.Chart.defaults.color = '#94a3b8';
+    </script>
+
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Configure PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style type="text/tailwindcss">
+    @layer theme {
+        :root {
+            --primary-color: #0f172a; /* Slate 900 */
+            --primary-light: #1e293b; /* Slate 800 */
+            --accent-color: #6366f1; /* Indigo 500 */
+            --accent-glow: rgba(99, 102, 241, 0.5);
+            --bg-color: #0f172a; /* Dark Background */
+            --sidebar-width: 280px;
+            --header-height: 70px;
+        }
+    }
+
+    @layer base {
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+    }
+
+    @layer components {
+        .btn {
+            @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-medium transition-all duration-300 transform active:scale-95 cursor-pointer;
+        }
+        .btn-primary {
+            @apply bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 border border-white/10;
+        }
+        .btn-glass {
+            @apply bg-white/10 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 shadow-lg;
+        }
+        
+        .card-glass {
+            @apply bg-slate-900/60 backdrop-blur-xl border border-white/5 rounded-2xl shadow-xl transition-all duration-300;
+        }
+        
+        .card-3d {
+            @apply card-glass hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-white/10 hover:-translate-y-1 relative overflow-hidden;
+        }
+
+        .input-glass {
+            @apply w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 text-slate-200 placeholder-slate-500 transition-all;
+        }
+
+        .sidebar-link {
+            @apply flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 relative overflow-hidden cursor-pointer;
+        }
+        .sidebar-link.active {
+            @apply bg-indigo-600/20 text-indigo-300 shadow-inner shadow-indigo-500/10 border border-indigo-500/20;
+        }
+        .sidebar-link.active::before {
+            content: '';
+            @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-500 rounded-r-full shadow-[0_0_10px_rgba(99,102,241,0.6)];
+        }
+    }
+    
+    /* Animations */
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+        50% { box-shadow: 0 0 25px rgba(99, 102, 241, 0.5); }
+    }
+    .animate-pulse-glow {
+        animation: pulse-glow 3s infinite;
+    }
+
+    @keyframes slide-up-fade {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slide-up {
+        animation: slide-up-fade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes flow-line {
+        0% { stroke-dashoffset: 1000; }
+        100% { stroke-dashoffset: 0; }
+    }
+    .animate-flow {
+        stroke-dasharray: 20;
+        animation: flow-line 2s linear infinite;
+    }
+
+    /* Custom Scrollbar */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+    }
+    
+    /* 3D Perspective Utils */
+    .perspective-1000 {
+        perspective: 1000px;
+    }
+    .preserve-3d {
+        transform-style: preserve-3d;
+    }
+    .rotate-y-12 {
+        transform: rotateY(12deg);
+    }
+    .rotate-x-12 {
+        transform: rotateX(12deg);
+    }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <!-- Utilities & Services -->
+    <script type="text/babel" src="utils/mockData.js"></script>
+    <script type="text/babel" src="utils/dbService.js"></script>
+    <script type="text/babel" src="utils/authService.js"></script>
+    <script type="text/babel" src="utils/aiAgent.js"></script>
+    <script type="text/babel" src="utils/fileParser.js"></script>
+    <script type="text/babel" src="utils/ragService.js"></script>
+    <script type="text/babel" src="utils/modelService.js"></script>
+
+    <!-- Components -->
+    <script type="text/babel" src="components/Icons.js"></script>
+    <script type="text/babel" src="components/Background3D.js"></script>
+    <script type="text/babel" src="components/Sidebar.js"></script>
+    <script type="text/babel" src="components/Header.js"></script>
+    <script type="text/babel" src="components/ChatInterface.js"></script>
+    <script type="text/babel" src="components/AgentLog.js"></script>
+    <script type="text/babel" src="components/RAGVisualizer.js"></script>
+
+    <!-- Pages -->
+    <script type="text/babel" src="pages/LoginPage.js"></script>
+    <script type="text/babel" src="pages/RegisterPage.js"></script>
+    <script type="text/babel" src="pages/UploadPage.js"></script>
+    <script type="text/babel" src="pages/DashboardPage.js"></script>
+    <script type="text/babel" src="pages/DataPage.js"></script>
+    <script type="text/babel" src="pages/ModelsPage.js"></script>
+    <script type="text/babel" src="pages/SettingsPage.js"></script>
+
+    <!-- App Entry -->
+    <script type="text/babel" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+[
+  {
+    "name": "analysis_project",
+    "fields": [
+      {
+        "name": "title",
+        "type": "text",
+        "description": "Title of the analysis project",
+        "options": null
+      },
+      {
+        "name": "file_name",
+        "type": "text",
+        "description": "Name of the uploaded file",
+        "options": null
+      },
+      {
+        "name": "row_count",
+        "type": "number",
+        "description": "Number of rows in dataset",
+        "options": null
+      },
+      {
+        "name": "col_count",
+        "type": "number",
+        "description": "Number of columns in dataset",
+        "options": null
+      },
+      {
+        "name": "status",
+        "type": "text",
+        "description": "Current status: analyzing, completed",
+        "options": null
+      },
+      {
+        "name": "insights",
+        "type": "rich_text",
+        "description": "JSON string of generated insights",
+        "options": null
+      },
+      {
+        "name": "charts",
+        "type": "rich_text",
+        "description": "JSON string of chart configurations",
+        "options": null
+      },
+      {
+        "name": "owner_id",
+        "type": "text",
+        "description": "ID of the user who owns this project",
+        "options": null
+      },
+      {
+        "name": "models_data",
+        "type": "rich_text",
+        "description": "JSON string of trained model metrics",
+        "options": null
+      }
+    ]
+  },
+  {
+    "name": "users",
+    "fields": [
+      {
+        "name": "email",
+        "type": "text",
+        "description": "User email address",
+        "options": null
+      },
+      {
+        "name": "password",
+        "type": "text",
+        "description": "User password",
+        "options": null
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "description": "User full name",
+        "options": null
+      },
+      {
+        "name": "api_key",
+        "type": "text",
+        "description": "User's Gemini API Key",
+        "options": null
+      }
+    ]
+  }
+]
